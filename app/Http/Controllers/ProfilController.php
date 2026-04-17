@@ -11,7 +11,7 @@ class ProfilController extends Controller {
             'semester' => 4,
             'keahlian' => ['PHP', 'Laravel', 'HTML', 'CSS', 'JavaScript']
         ];
-        return view('profil', $data);
+        return view('katalog.profil', $data);
     }
     public function show($nim) {
         return "Menampilkan Detail Profil untuk NIM: " . $nim;
