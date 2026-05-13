@@ -9,7 +9,7 @@ class Booking extends Model
 {
     // Tambahkan 'user_id' ke dalam fi;;able
     protected $fillable = [
-        'user_id', 'house_id', 'user_name', 'user_phone', 'start_date', 'duration_months', 'total_price', 'status'
+        'user_id', 'house_id', 'user_name', 'user_phone', 'start_date', 'duration_months', 'total_price', 'status', 'snap_token'
     ];
 
     public function house(): BelongsTo

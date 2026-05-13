@@ -20,15 +20,44 @@ class BookingController extends Controller
     }
 
     /**
-     * Menampilkan riwayat sewa milik user yang sedang login (User)
+     * Menampilkan riwayat sewa milik user yang sedang login (User + Midtrans)
      */
     public function myBookings()
     {
-        // Mengambil data sewa hanya milik user yang sedang login
+        // 1. Ambil data sewa milik user yang login
         $bookings = Booking::where('user_id', Auth::id())
                     ->with('house')
                     ->latest()
                     ->get();
+
+        // 2. Konfigurasi Kredensial Midtrans Sandbox
+        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        // 3. Loop untuk generate snap_token jika status masih pending
+        foreach ($bookings as $booking) {
+            if ($booking->status == 'pending' && !$booking->snap_token) {
+                $params = [
+                    'transaction_details' => [
+                        'order_id' => 'BOOK-' . $booking->id . '-' . time(),
+                        'gross_amount' => (int) $booking->total_price,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $booking->user_name,
+                        'phone' => $booking->user_phone,
+                    ],
+                ];
+
+                try {
+                    $snapToken = \Midtrans\Snap::getSnapToken($params);
+                    $booking->update(['snap_token' => $snapToken]);
+                } catch (\Exception $e) {
+                    // Biarkan kosong jika gagal akibat kendala jaringan
+                }
+            }
+        }
 
         return view('bookings.my_bookings', compact('bookings'));
     }
@@ -71,7 +100,7 @@ class BookingController extends Controller
 
         // 4. Simpan ke Database
         Booking::create([
-            'user_id' => Auth::id(), // Pastikan menggunakan Auth::id() dengan A besar
+            'user_id' => Auth::id(),
             'house_id' => $request->house_id,
             'user_name' => $request->user_name,
             'user_phone' => $request->user_phone,

@@ -21,7 +21,7 @@
                             <div class="flex justify-between items-start mb-2">
                                 <h2 class="text-xl font-bold text-gray-800">{{ $booking->house->title }}</h2>
                                 <span class="px-3 py-1 rounded-full text-xs font-bold uppercase
-                                    {{ $booking->status == 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700' }}">
+                                    {{ $booking->status == 'pending' ? 'bg-yellow-100 text-yellow-700' : ($booking->status == 'confirmed' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700') }}">
                                     {{ $booking->status }}
                                 </span>
                             </div>
@@ -38,27 +38,37 @@
                                 </div>
                             </div>
 
-                            <!-- Petunjuk Pembayaran jika status masih Pending -->
-                            @if($booking->status == 'pending')
+                            <!-- Tombol Bayar Otomatis Midtrans jika status masih Pending -->
+                            @if($booking->status == 'pending' && $booking->snap_token)
                                 <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                                    <p class="text-sm font-bold text-blue-800 mb-1">Silakan Lakukan Pembayaran:</p>
-                                    <p class="text-xs text-blue-600 mb-3 leading-relaxed">Transfer ke rekening berikut dan kirim bukti bayar ke WhatsApp Admin.</p>
-                                    <div class="bg-white p-3 rounded-lg border border-blue-200">
-                                        <p class="text-sm font-mono font-bold text-gray-700">Bank BCA: 123-456-7890</p>
-                                        <p class="text-xs text-gray-500">A/N Sewa Rumah Indonesia</p>
-                                    </div>
+                                    <p class="text-sm font-bold text-blue-800 mb-3">Pembayaran Online Otomatis:</p>
 
-                                    {{-- Link WhatsApp Otomatis --}}
-                                    @php
-                                        $pesanWA = urlencode("Halo Admin, saya ingin konfirmasi pembayaran sewa rumah " . $booking->house->title . " atas nama " . Auth::user()->name);
-                                    @endphp
-                                    <a href="https://wa.me{{ $pesanWA }}"
-                                       target="_blank"
-                                       class="block mt-3 text-center bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm">
-                                       Kirim Bukti via WhatsApp
-                                    </a>
+                                    <button id="pay-button-{{ $booking->id }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3 rounded-xl transition shadow-md">
+                                        Bayar Sekarang (QRIS/VA)
+                                    </button>
                                 </div>
+
+                                <!-- Script SDK Snap Midtrans Resmi -->
+                                <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+                                <script type="text/javascript">
+                                    document.getElementById('pay-button-{{ $booking->id }}').onclick = function(e){
+                                        e.preventDefault();
+                                        window.snap.pay('{{ $booking->snap_token }}', {
+                                            onSuccess: function(result){
+                                                alert("Pembayaran Berhasil! Memperbarui halaman...");
+                                                window.location.reload();
+                                            },
+                                            onPending: function(result){
+                                                alert("Silakan selesaikan pembayaran Anda sesuai instruksi.");
+                                            },
+                                            onError: function(result){
+                                                alert("Pembayaran gagal diproses!");
+                                            }
+                                        });
+                                    };
+                                </script>
                             @endif
+
                         </div>
                     </div>
                 @empty

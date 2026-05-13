@@ -2,7 +2,7 @@
     <div class="bg-gray-50 min-h-screen py-12">
         <div class="container mx-auto px-4">
 
-            <!-- Notifikasi Berhasil Hapus/Tambah -->
+            <!-- Notifikasi Berhasil Hapus/Tambah/Edit -->
             @if(session('message'))
                 <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl flex justify-between items-center shadow-sm">
                     <span>{{ session('message') }}</span>
@@ -53,25 +53,33 @@
                         <!-- Content Area -->
                         <div class="p-6 flex flex-col flex-grow">
                             <h2 class="text-xl font-bold text-gray-800 mb-2 truncate">{{ $house->title }}</h2>
-                            <div class="flex items-center text-gray-500 mb-4">
+                            <div class="flex items-center text-gray-500 mb-6">
                                 <svg class="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
                                 <span class="text-sm truncate">{{ $house->address }}</span>
                             </div>
 
-                            <!-- Tombol Aksi (Lihat Detail & Hapus) -->
+                            <!-- Tombol Aksi (Lihat Detail, Edit, & Hapus) -->
                             <div class="mt-auto space-y-3 pt-4 border-t border-gray-100">
+                                <!-- Tombol Lihat Detail (Tetap Ada) -->
                                 <a href="{{ route('houses.show', $house->id) }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-md shadow-blue-100">
                                     Lihat Detail
                                 </a>
 
-                                {{-- Tombol Hapus (Admin Only) --}}
-                                <form action="{{ route('admin.houses.destroy', $house->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus rumah ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="w-full text-center bg-red-50 text-red-600 hover:bg-red-100 font-bold py-2 rounded-xl transition-colors duration-200 text-sm">
-                                        Hapus Rumah
-                                    </button>
-                                </form>
+                                {{-- TOMBOL EDIT RUMAH (Hanya untuk Admin) --}}
+                                @if(Auth::check() && Auth::user()->email == 'admin@gmail.com')
+                                    <a href="{{ route('admin.houses.edit', $house->id) }}" class="block w-full text-center bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded-xl transition-colors duration-200 text-sm shadow-sm">
+                                        Edit Data Rumah
+                                    </a>
+
+                                    {{-- Tombol Hapus Rumah --}}
+                                    <form action="{{ route('admin.houses.destroy', $house->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus rumah ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-full text-center bg-red-50 text-red-600 hover:bg-red-100 font-bold py-2 rounded-xl transition-colors duration-200 text-sm">
+                                            Hapus Rumah
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>

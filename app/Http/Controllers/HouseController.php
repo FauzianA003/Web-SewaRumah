@@ -54,6 +54,43 @@ class HouseController extends Controller
         return view('houses.show', compact('house'));
     }
 
+    // --- TAMBAHKAN FITUR EDIT & UPDATE DI SINI ---
+
+    // Menampilkan halaman form edit rumah
+    public function edit($id)
+    {
+        $house = House::findOrFail($id);
+        return view('houses.edit', compact('house'));
+    }
+
+    // Memproses pembaruan data ke database
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'price_per_month' => 'required|numeric',
+            'address' => 'required|string',
+            'description' => 'required|string',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        $house = House::findOrFail($id);
+        $data = $request->all();
+
+        if ($request->hasFile('thumbnail')) {
+            // Hapus foto lama jika ada di storage lokal
+            if ($house->thumbnail && !filter_var($house->thumbnail, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($house->thumbnail);
+            }
+            // Simpan foto baru
+            $data['thumbnail'] = $request->file('thumbnail')->store('houses', 'public');
+        }
+
+        $house->update($data);
+
+        return redirect()->route('houses.index')->with('message', 'Data rumah berhasil diperbarui!');
+    }
+
     // Tambahkan fungsi hapus di sini
     public function destroy($id)
     {
