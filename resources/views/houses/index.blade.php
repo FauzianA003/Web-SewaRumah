@@ -61,9 +61,15 @@
                             <!-- Tombol Aksi (Lihat Detail, Edit, & Hapus) -->
                             <div class="mt-auto space-y-3 pt-4 border-t border-gray-100">
                                 <!-- Tombol Lihat Detail (Tetap Ada) -->
-                                <a href="{{ route('houses.show', $house->id) }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-md shadow-blue-100">
+                                @if($house->is_available)
+                                <a href="{{ route('houses.show', $house->id) }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-md">
                                     Lihat Detail
                                 </a>
+                                @else
+                                <button disabled class="block w-full text-center bg-gray-300 text-gray-500 font-semibold py-3 rounded-xl cursor-not-allowed">
+                                    Sudah Dihuni / Disewa
+                                </button>
+                                @endif
 
                                 {{-- TOMBOL EDIT RUMAH (Hanya untuk Admin) --}}
                                 @if(Auth::check() && Auth::user()->email == 'admin@gmail.com')

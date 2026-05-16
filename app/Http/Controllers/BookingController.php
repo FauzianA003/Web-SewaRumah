@@ -64,11 +64,23 @@ class BookingController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->update(['status' => $request->status]);
+    $booking = Booking::with('house')->findOrFail($id);
+    $booking->update(['status' => $request->status]);
 
-        return back()->with('message', 'Status pesanan berhasil diperbarui!');
+    // Jika admin mengubah status menjadi 'confirmed' atau 'completed'
+    if (in_array($request->status, ['confirmed', 'completed'])) {
+        // Update rumah terkait menjadi tidak tersedia (Sudah Dihuni)
+        $booking->house->update(['is_available' => false]);
     }
+    // Jika admin membatalkan atau mengembalikan ke 'pending'
+    elseif (in_array($request->status, ['pending', 'cancelled'])) {
+        // Kembalikan rumah menjadi tersedia lagi
+        $booking->house->update(['is_available' => true]);
+    }
+
+    return back()->with('message', 'Status pesanan dan ketersediaan rumah berhasil diperbarui!');
+}
+
 
     public function destroy($id)
     {

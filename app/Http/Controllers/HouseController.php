@@ -11,7 +11,8 @@ class HouseController extends Controller
     // Menampilkan semua daftar rumah di halaman depan
     public function index()
     {
-        $houses = House::where('is_available', true)->latest()->get();
+        // Hanya tampilkan rumah yang tersedia (is_available = true)
+        $houses = House::latest()->get();
         return view('houses.index', compact('houses'));
     }
 

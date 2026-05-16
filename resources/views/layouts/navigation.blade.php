@@ -36,6 +36,11 @@
                             </x-nav-link>
                         @endif
                     @endauth
+
+                    <!-- TAMBAHKAN LINK KONTAK DI SINI -->
+                    <x-nav-link :href="route('kontak')" :active="request()->routeIs('kontak')">
+                        {{ __('Kontak') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -95,6 +100,10 @@
 
             <x-responsive-nav-link :href="route('bookings.my')" :active="request()->routeIs('bookings.my')">
                 {{ __('Sewa Saya') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('kontak')" :active="request()->routeIs('kontak')">
+                {{ __('Kontak') }}
             </x-responsive-nav-link>
 
             <!-- Menu Admin Mobile: Dibungkus @auth dan @endif dengan benar -->

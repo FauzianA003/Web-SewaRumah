@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login'); // Redirect ke halaman login sebagai halaman utama
 Route::get('/houses', [HouseController::class, 'index'])->name('houses.index');
 Route::get('/houses/{id}', [HouseController::class, 'show'])->name('houses.show');
-
+route::get('/kontak', function () {
+    return view('kontak');
+})->name('kontak');
 
 // --- AKSES USER LOGIN (Wajib Login) ---
 Route::middleware(['auth', 'verified'])->group(function () {
