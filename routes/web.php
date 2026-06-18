@@ -4,19 +4,19 @@ use App\Http\Controllers\HouseController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan; // <-- WAJIB TAMBAHKAN INI DI ATAS
 
 /*
-
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
 
 // --- AKSES PUBLIK (Siapa saja bisa lihat) ---
-Route::redirect('/', '/login'); // Redirect ke halaman login sebagai halaman utama
+Route::redirect('/', '/login');
 Route::get('/houses', [HouseController::class, 'index'])->name('houses.index');
 Route::get('/houses/{id}', [HouseController::class, 'show'])->name('houses.show');
-route::get('/kontak', function () {
+Route::get('/kontak', function () {
     return view('kontak');
 })->name('kontak');
 
@@ -35,7 +35,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('bookings.success');
 
     // --- AKSES ADMIN (Manajemen Katalog & Pesanan) ---
-    // Diproteksi agar hanya email admin@gmail.com yang bisa masuk
     Route::group(['middleware' => function ($request, $next) {
         if ($request->user() && $request->user()->email === 'admin@gmail.com') {
             return $next($request);
@@ -50,7 +49,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // --- RUTE EDIT & UPDATE YANG BARU DITAMBAHKAN ---
         Route::get('/admin/houses/{id}/edit', [HouseController::class, 'edit'])->name('admin.houses.edit');
         Route::put('/admin/houses/{id}', [HouseController::class, 'update'])->name('admin.houses.update');
-
         Route::delete('/admin/houses/{id}', [HouseController::class, 'destroy'])->name('admin.houses.destroy');
 
         // Manajemen Pesanan (Booking)
@@ -66,3 +64,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// =========================================================================
+// ROUTE TEMPORER UNTUK MIGRASI DATABASE VERCEL (TARUH DI SINI)
+// =========================================================================
+Route::get('/run-migration', function () {
+    try {
+        // Menggunakan artisan command untuk migrate database cloud
+        Artisan::call('migrate:fresh', ['--force' => true]);
+        return "Pesan: Migrasi database berhasil dijalankan!";
+    } catch (\Exception $e) {
+        return "Error saat migrasi: " . $e->getMessage();
+    }
+});
