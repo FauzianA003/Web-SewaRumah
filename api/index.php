@@ -1,3 +1,3 @@
 <?php
-// Meneruskan request Vercel ke index.php bawaan Laravel
+// api/index.php
 require __DIR__ . '/../public/index.php';
