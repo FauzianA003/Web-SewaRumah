@@ -11,7 +11,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind('translator', function ($app) {
+            return $app->make('translation.loader');
+        });
     }
 
     /**
