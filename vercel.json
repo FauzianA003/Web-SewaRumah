@@ -1,14 +1,9 @@
 {
-  "$schema": "https://json.schemastore.org/vercel",
-  "functions": {
-    "api/lambda.php": {
-      "runtime": "vercel-php@0.7.4"
-    }
-  },
+  "version": 2,
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/lambda.php"
+      "destination": "/public/index.php"
     }
   ]
 }
