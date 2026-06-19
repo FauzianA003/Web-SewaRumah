@@ -66,12 +66,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/auth.php';
 
 // =========================================================================
-// ROUTE TEMPORER UNTUK MIGRASI DATABASE VERCEL (TARUH DI SINI)
+// ROUTE TEMPORER UNTUK MIGRASI DATABASE VERCEL (SUDAH DIPERBAIKI UNTUK PRODUKSI)
 // =========================================================================
 Route::get('/run-migration', function () {
     try {
-        // Menggunakan artisan command untuk migrate database cloud
-        Artisan::call('migrate:fresh', ['--force' => true]);
+        // Menggunakan perintah 'migrate' biasa dengan --force agar aman dan diizinkan oleh sistem produksi
+        Artisan::call('migrate', ['--force' => true]);
         return "Pesan: Migrasi database berhasil dijalankan!";
     } catch (\Exception $e) {
         return "Error saat migrasi: " . $e->getMessage();
